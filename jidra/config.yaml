@@ -39,4 +39,4 @@ flow:
       - "com.example.search.components.metrics"
     method_name_patterns: []
     class_name_patterns:
-      - "SearchServiceMetrics"
+      - "ServiceMetrics"
