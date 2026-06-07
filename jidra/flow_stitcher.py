@@ -31,7 +31,7 @@ NOISY_UNRESOLVED_RECEIVERS = {
     "headersmap",
     "dynamiccontainers",
     "postrankingrules",
-    "sxmcontext",
+    "appcontext",
 }
 
 RECEIVER_SOURCE_PRIORITY = {
