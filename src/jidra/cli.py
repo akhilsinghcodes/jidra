@@ -1115,9 +1115,15 @@ def _parse_args() -> argparse.Namespace:
     )
 
     ui_parser = subparsers.add_parser("ui", help="Launch the JIDRA web UI")
-    ui_parser.add_argument("--host", default="127.0.0.1", help="Bind host (default: 127.0.0.1)")
-    ui_parser.add_argument("--port", type=int, default=7474, help="Bind port (default: 7474)")
-    ui_parser.add_argument("--reload", action="store_true", help="Enable uvicorn auto-reload")
+    ui_parser.add_argument(
+        "--host", default="127.0.0.1", help="Bind host (default: 127.0.0.1)"
+    )
+    ui_parser.add_argument(
+        "--port", type=int, default=7474, help="Bind port (default: 7474)"
+    )
+    ui_parser.add_argument(
+        "--reload", action="store_true", help="Enable uvicorn auto-reload"
+    )
 
     return parser.parse_args()
 
@@ -2177,7 +2183,10 @@ def _write_doc_graph(output_dir: Path, db_path: Path) -> Path | None:
     """Generate doc_graph.html alongside the code graph. Returns path or None if no docs."""
     try:
         from .indexing import doc_store
-        from .indexing.doc_graph_visualizer import build_doc_graph_data, render_doc_graph_html
+        from .indexing.doc_graph_visualizer import (
+            build_doc_graph_data,
+            render_doc_graph_html,
+        )
 
         conn = graph_store.connect(db_path)
         doc_store.migrate(conn)
@@ -2278,7 +2287,7 @@ def _render_history_html(
         for i, r in enumerate(index_rows):
             repo_short = Path(r["repo"]).name
             langs_html = " ".join(
-                _lang_badge(l) for l in r["languages"].split(",") if l
+                _lang_badge(lang) for lang in r["languages"].split(",") if lang
             )
             cls = "row-alt" if i % 2 else ""
             rows.append(
@@ -2976,7 +2985,10 @@ def main() -> None:
 
     if args.command == "graph-docs":
         from .indexing import doc_store
-        from .indexing.doc_graph_visualizer import build_doc_graph_data, render_doc_graph_html
+        from .indexing.doc_graph_visualizer import (
+            build_doc_graph_data,
+            render_doc_graph_html,
+        )
 
         db_path = _resolve_graph_db_path(args.graph)
         conn = graph_store.connect(db_path)
@@ -3063,8 +3075,6 @@ def main() -> None:
             table.add_column("Elapsed", style="#f59e0b", width=9, justify="right")
             table.add_column("Status", width=8)
 
-            rows_data: list[tuple] = []
-
             def _fmt_size(b: int) -> str:
                 return f"{b / 1024:.1f}KB" if b >= 1024 else f"{b}B"
 
@@ -3079,10 +3089,6 @@ def main() -> None:
                         n_chunks = index_document(
                             conn, str(f), class_names, method_names
                         )
-                        # Count distinct linked classes across chunks for this source
-                        src_chunks = doc_store.query_by_class(
-                            conn, "", limit=0
-                        )  # just need count
                         linked_set: set[str] = set()
                         for row in conn.execute(
                             "SELECT linked_classes FROM doc_chunks WHERE source_path=?",
@@ -3130,7 +3136,6 @@ def main() -> None:
 
             sources = doc_store.list_sources(conn)
             total_chunks = sum(s["chunk_count"] for s in sources)
-            ok_count = sum(1 for f in files if True)  # table already shows failures
             rprint(
                 f"\n[bold #38bdf8]Done.[/bold #38bdf8] {len(files)} files · {total_chunks} total chunks in doc store"
             )
